@@ -71,3 +71,18 @@ print_message "$BLUE" "Creating environment for: $user_name"
 print_message "$BLUE" "Directory name: $main_dir"
 echo
 
+# Check if main directory already exists
+if [ -d "$main_dir" ]; then
+    echo -n "Directory $main_dir already exists. Do you want to overwrite it? (y/n): "
+    read overwrite
+    if [ "$overwrite" != "y" ] && [ "$overwrite" != "Y" ]; then
+        print_message "$YELLOW" "Setup cancelled by user."
+        exit 0
+    fi
+    rm -rf "$main_dir"
+    print_message "$YELLOW" "Removed existing directory"
+fi
+
+# Create main directory
+create_directory "$main_dir"
+
