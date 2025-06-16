@@ -197,3 +197,19 @@ create_file "$main_dir/modules/functions.sh" "$functions_content"
 create_file "$main_dir/assets/submissions.txt" "$submissions_content"
 create_file "$main_dir/startup.sh" "$startup_content"
 
+# Make all .sh files executable
+print_message "$BLUE" "Setting executable permissions for .sh files..."
+find "$main_dir" -name "*.sh" -type f -exec chmod +x {} \;
+check_success "Set executable permissions for all .sh files"
+
+# Verify the structure
+print_message "$BLUE" "Directory structure created:"
+tree "$main_dir" 2>/dev/null || find "$main_dir" -type f | sort
+
+echo
+print_message "$GREEN" "=== Environment Setup Complete! ==="
+print_message "$BLUE" "To test the application:"
+print_message "$BLUE" "1. cd $main_dir"
+print_message "$BLUE" "2. ./startup.sh"
+echo
+
