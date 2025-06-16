@@ -18,6 +18,28 @@ print_message() {
     echo -e "${color}${message}${NC}"
 }
 
+# Function to check if command was successful
+check_success() {
+    if [ $? -eq 0 ]; then
+        print_message "$GREEN" "✓ $1"
+    else
+        print_message "$RED" "✗ Failed: $1"
+        exit 1
+    fi
+}
+
+# Function to create directory with error handling
+create_directory() {
+    local dir_path=$1
+    if [ ! -d "$dir_path" ]; then
+        mkdir -p "$dir_path"
+        check_success "Created directory: $dir_path"
+    else
+        print_message "$YELLOW" "Directory already exists: $dir_path"
+    fi
+}
+
+
 # Function to createa file with content
 create_file() {
 	local file_path=$1
