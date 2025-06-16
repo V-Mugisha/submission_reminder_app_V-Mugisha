@@ -86,3 +86,114 @@ fi
 # Create main directory
 create_directory "$main_dir"
 
+# Create subdirectories
+print_message "$BLUE" "Creating subdirectories..."
+create_directory "$main_dir/app"
+create_directory "$main_dir/modules"
+create_directory "$main_dir/assets"
+create_directory "$main_dir/config"
+
+# Content for config.env
+config_content='# This is the config file
+ASSIGNMENT="Shell Navigation"
+DAYS_REMAINING=2
+'
+
+# Content for reminder.sh
+reminder_content='#!/bin/bash
+
+# Source environment variables and helper functions
+source ./config/config.env
+source ./modules/functions.sh
+
+# Path to the submissions file
+submissions_file="./assets/submissions.txt"
+
+# Print remaining time and run the reminder function
+echo "Assignment: $ASSIGNMENT"
+echo "Days remaining to submit: $DAYS_REMAINING days"
+echo "--------------------------------------------"
+
+check_submissions $submissions_file
+'
+
+# Content for functions.sh  
+functions_content='#!/bin/bash
+
+# Function to read submissions file and output students who have not submitted
+function check_submissions {
+    local submissions_file=$1
+    echo "Checking submissions in $submissions_file"
+
+    # Skip the header and iterate through the lines
+    while IFS=, read -r student assignment status; do
+        # Remove leading and trailing whitespace
+        student=$(echo "$student" | xargs)
+        assignment=$(echo "$assignment" | xargs)
+        status=$(echo "$status" | xargs)
+
+        # Check if assignment matches and status is not submitted
+        if [[ "$assignment" == "$ASSIGNMENT" && "$status" == "not submitted" ]]; then
+            echo "Reminder: $student has not submitted the $ASSIGNMENT assignment!"
+        fi
+    done < <(tail -n +2 "$submissions_file") # Skip the header
+}
+'
+
+# Content for submissions.txt with original + 5 additional students
+submissions_content='
+student, assignment, submission status
+Chinemerem, Shell Navigation, not submitted
+Chiagoziem, Git, submitted
+Divine, Shell Navigation, not submitted
+Anissa, Shell Basics, submitted
+Victor, Shell Navigation, not submitted
+Derrick, Linux and IT Tools, submitted
+Yannick, Self Leadership and Team Dynamics, not submitted
+George, E-Lab, submitted
+Deborah, Reflective Thinking, not submitted
+'
+
+# Content for startup.sh
+startup_content='#!/bin/bash
+# Startup script for submission reminder app
+
+# Source configuration and functions
+source config/config.env
+source modules/functions.sh
+
+echo "=== Submission Reminder App ==="
+echo "Assignment: $ASSIGNMENT"
+echo "Deadline: $DEADLINE"
+echo
+
+# Check current directory structure
+if [ ! -f "assets/submissions.txt" ]; then
+    echo "Error: submissions.txt not found!"
+    exit 1
+fi
+
+if [ ! -f "app/reminder.sh" ]; then
+    echo "Error: reminder.sh not found!"
+    exit 1
+fi
+
+echo "Starting reminder application..."
+echo
+
+# Execute the main reminder script
+./app/reminder.sh
+
+echo
+echo "Application execution completed."
+'
+
+# Create and populate files
+print_message "$BLUE" "Creating and populating files..."
+
+create_file "$main_dir/config/config.env" "$config_content"
+create_file "$main_dir/app/reminder.sh" "$reminder_content"
+create_file "$main_dir/modules/functions.sh" "$functions_content"
+create_file "$main_dir/assets/submissions.txt" "$submissions_content"
+create_file "$main_dir/startup.sh" "$startup_content"
+
