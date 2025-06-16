@@ -47,3 +47,27 @@ create_file() {
     	echo "$content" > "$file_path"
 	check_success "Created file: $file_path"
 }
+
+# Main script starts here
+print_message "$BLUE" "=== Submission Reminder App Environment Setup ==="
+echo
+
+# Prompt user for their name
+echo -n "Enter your name: "
+read user_name
+
+# Validate input
+if [ -z "$user_name" ]; then
+    print_message "$RED" "Error: Name cannot be empty!"
+    exit 1
+fi
+
+# Remove spaces and special characters from name for directory
+clean_name=$(echo "$user_name" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+
+# Create main directory
+main_dir="submission_reminder_${clean_name}"
+print_message "$BLUE" "Creating environment for: $user_name"
+print_message "$BLUE" "Directory name: $main_dir"
+echo
+
