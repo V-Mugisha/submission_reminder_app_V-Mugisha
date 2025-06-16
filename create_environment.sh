@@ -213,3 +213,21 @@ print_message "$BLUE" "1. cd $main_dir"
 print_message "$BLUE" "2. ./startup.sh"
 echo
 
+# Test if startup.sh works
+print_message "$BLUE" "Testing startup script..."
+cd "$main_dir"
+if [ -x "./startup.sh" ]; then
+    print_message "$GREEN" "startup.sh is executable and ready to run"
+    echo "Would you like to test the application now? (y/n): "
+    read test_now
+    if [ "$test_now" = "y" ] || [ "$test_now" = "Y" ]; then
+        echo
+        print_message "$BLUE" "Running application test..."
+        ./startup.sh
+    fi
+else
+    print_message "$RED" "Warning: startup.sh is not executable"
+fi
+
+cd ..
+print_message "$GREEN" "Setup script completed successfully!"
