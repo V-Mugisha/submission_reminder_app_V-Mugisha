@@ -9,3 +9,21 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
+
+# Function to print colored messages
+print_message() {
+    local color=$1
+    local message=$2
+    echo -e "${color}${message}${NC}"
+}
+
+# Function to check if command was successful
+check_success() {
+    if [ $? -eq 0 ]; then
+        print_message "$GREEN" "✓ $1"
+    else
+        print_message "$RED" "✗ Failed: $1"
+        exit 1
+    fi
+}
+
