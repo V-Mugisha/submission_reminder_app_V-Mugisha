@@ -116,3 +116,62 @@ verify_startup_script() {
     return 0
 }
 
+# Main script execution starts here
+print_message "$BLUE" "=== Submission Reminder Copilot Script ==="
+print_message "$BLUE" "This script updates the assignment name and checks submission status"
+echo
+
+# Find the submission reminder directory
+print_message "$BLUE" "Searching for submission reminder directory..."
+app_directory=$(find_submission_directory)
+print_message "$GREEN" "Found directory: $app_directory"
+
+# Define paths
+config_file="$app_directory/config/config.env"
+startup_script="$app_directory/startup.sh"
+
+# Check if config file exists
+if [ ! -f "$config_file" ]; then
+    print_message "$RED" "Error: Configuration file not found at $config_file"
+    print_message "$YELLOW" "Please ensure the application environment is properly set up."
+    exit 1
+fi
+
+# Display current assignment
+print_message "$BLUE" "Current configuration:"
+current_assignment=$(grep "^ASSIGNMENT=" "$config_file" | head -1)
+print_message "$YELLOW" "$current_assignment"
+
+# Prompt user for new assignment name
+echo
+print_message "$BLUE" "Enter the new assignment name:"
+echo -n "Assignment name: "
+read new_assignment_name
+
+# Validate input
+if ! validate_assignment_name "$new_assignment_name"; then
+    print_message "$RED" "Operation cancelled due to invalid input."
+    exit 1
+fi
+
+# Confirm the change
+echo
+print_message "$YELLOW" "You are about to change the assignment to: \"$new_assignment_name\""
+echo -n "Continue? (y/n): "
+read confirm_change
+
+if [ "$confirm_change" != "y" ] && [ "$confirm_change" != "Y" ]; then
+    print_message "$YELLOW" "Operation cancelled by user."
+    exit 0
+fi
+
+# Update the assignment in config file
+print_message "$BLUE" "Updating assignment in configuration file..."
+update_assignment "$config_file" "$new_assignment_name"
+
+# Verify startup script
+print_message "$BLUE" "Verifying startup script..."
+if ! verify_startup_script "$app_directory"; then
+    exit 1
+fi
+
