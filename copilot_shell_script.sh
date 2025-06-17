@@ -27,3 +27,28 @@ check_success() {
     fi
 }
 
+# Function to find submission reminder directory
+find_submission_directory() {
+    local dirs=(submission_reminder_*)
+    if [ ${#dirs[@]} -eq 0 ] || [ ! -d "${dirs[0]}" ]; then
+        print_message "$RED" "Error: No submission_reminder_* directory found!"
+        print_message "$YELLOW" "Please run create_environment.sh first to create the application environment."
+        exit 1
+    elif [ ${#dirs[@]} -gt 1 ]; then
+        print_message "$YELLOW" "Multiple submission directories found:"
+        for i in "${!dirs[@]}"; do
+            echo "$((i+1)). ${dirs[i]}"
+        done
+        echo -n "Select directory number: "
+        read selection
+        if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -ge 1 ] && [ "$selection" -le "${#dirs[@]}" ]; then
+            echo "${dirs[$((selection-1))]}"
+        else
+            print_message "$RED" "Invalid selection!"
+            exit 1
+        fi
+    else
+        echo "${dirs[0]}"
+    fi
+}
+
