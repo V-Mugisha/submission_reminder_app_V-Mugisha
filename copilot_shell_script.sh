@@ -79,3 +79,40 @@ backup_config() {
     check_success "Created backup: $backup_file"
 }
 
+# Function to update assignment in config file
+update_assignment() {
+    local config_file="$1"
+    local new_assignment="$2"
+    
+    # Create backup before making changes
+    backup_config "$config_file"
+    
+    # Use sed to update the ASSIGNMENT value on line 2
+    # Handle both quoted and unquoted values
+    sed -i "2s/^ASSIGNMENT=.*/ASSIGNMENT=\"$new_assignment\"/" "$config_file"
+    check_success "Updated ASSIGNMENT in config file"
+    
+    # Verify the change was made
+    local updated_value=$(grep "^ASSIGNMENT=" "$config_file" | head -1)
+    print_message "$BLUE" "Updated assignment: $updated_value"
+}
+
+# Function to verify startup script exists and is executable
+verify_startup_script() {
+    local app_dir="$1"
+    local startup_script="$app_dir/startup.sh"
+    
+    if [ ! -f "$startup_script" ]; then
+        print_message "$RED" "Error: startup.sh not found in $app_dir"
+        return 1
+    fi
+    
+    if [ ! -x "$startup_script" ]; then
+        print_message "$YELLOW" "Warning: startup.sh is not executable. Making it executable..."
+        chmod +x "$startup_script"
+        check_success "Made startup.sh executable"
+    fi
+    
+    return 0
+}
+
