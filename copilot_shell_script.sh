@@ -52,3 +52,30 @@ find_submission_directory() {
     fi
 }
 
+# Function to validate assignment name input
+validate_assignment_name() {
+    local assignment_name="$1"
+    if [ -z "$assignment_name" ]; then
+        print_message "$RED" "Error: Assignment name cannot be empty!"
+        return 1
+    fi
+    # Check for potentially problematic characters
+    if [[ "$assignment_name" =~ [\"\'\\] ]]; then
+        print_message "$YELLOW" "Warning: Assignment name contains special characters that might cause issues."
+        echo -n "Continue anyway? (y/n): "
+        read continue_choice
+        if [ "$continue_choice" != "y" ] && [ "$continue_choice" != "Y" ]; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+# Function to backup config file
+backup_config() {
+    local config_file="$1"
+    local backup_file="${config_file}.backup.$(date +%Y%m%d_%H%M%S)"
+    cp "$config_file" "$backup_file"
+    check_success "Created backup: $backup_file"
+}
+
