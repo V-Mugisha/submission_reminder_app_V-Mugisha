@@ -175,3 +175,42 @@ if ! verify_startup_script "$app_directory"; then
     exit 1
 fi
 
+# Ask user if they want to run the application now
+echo
+print_message "$GREEN" "Assignment updated successfully!"
+print_message "$BLUE" "Would you like to run the application now to check submission status? (y/n): "
+read run_now
+
+if [ "$run_now" = "y" ] || [ "$run_now" = "Y" ]; then
+    print_message "$BLUE" "Changing to application directory and running startup.sh..."
+    echo
+    print_message "$BLUE" "=========================================="
+    
+    # Change to application directory and run startup.sh
+    cd "$app_directory"
+    if [ $? -eq 0 ]; then
+        ./startup.sh
+        startup_exit_code=$?
+        echo
+        print_message "$BLUE" "=========================================="
+        if [ $startup_exit_code -eq 0 ]; then
+            print_message "$GREEN" "Application completed successfully!"
+        else
+            print_message "$YELLOW" "Application completed with exit code: $startup_exit_code"
+        fi
+    else
+        print_message "$RED" "Failed to change to application directory"
+        exit 1
+    fi
+    
+    # Return to original directory
+    cd - > /dev/null
+else
+    print_message "$BLUE" "To run the application later:"
+    print_message "$BLUE" "1. cd $app_directory"
+    print_message "$BLUE" "2. ./startup.sh"
+fi
+
+echo
+print_message "$GREEN" "Copilot script completed successfully!"
+print_message "$BLUE" "Assignment is now set to: \"$new_assignment_name\""
